@@ -1,8 +1,8 @@
 <script setup>
 import { reactive } from "vue";
 import { userLogin } from "../../lib/api/UserApi";
-import { alertError, alertSuccess } from "../../lib/alert";
-import { useRouter } from "vue-router";
+import { alertError } from "../../lib/alert";
+import { RouterLink, useRouter } from "vue-router";
 import { useLocalStorage } from "@vueuse/core";
 
 const router = useRouter();
@@ -93,10 +93,10 @@ const handleLogin = async () => {
 
       <div class="text-center text-sm text-gray-400">
         Don't have an account?
-        <a
-          href="register.html"
+        <RouterLink
+          to="/register"
           class="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-200"
-          >Sign up</a
+          >Sign up</RouterLink
         >
       </div>
     </form>
