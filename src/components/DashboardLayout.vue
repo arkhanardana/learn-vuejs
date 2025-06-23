@@ -1,10 +1,12 @@
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
+import { useLocalStorage } from "@vueuse/core";
 
 const { push } = useRouter();
 
-const token = localStorage.getItem("token");
-if (!token || token === "") {
+const token = useLocalStorage("token", "");
+
+if (!token.value || token.value === "") {
   push({
     path: "/login",
   });
