@@ -5,5 +5,16 @@
     <RouterView />
   </div>
 </template>
-<script setup></script>
+<script setup>
+import { useRouter } from "vue-router";
+
+const token = localStorage.getItem("token");
+
+const router = useRouter();
+if (token !== "") {
+  router.push({
+    path: "/dashboard",
+  });
+}
+</script>
 <style lang=""></style>

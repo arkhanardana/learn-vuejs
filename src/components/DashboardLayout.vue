@@ -1,5 +1,14 @@
 <script setup>
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
+
+const { push } = useRouter();
+
+const token = localStorage.getItem("token");
+if (!token || token === "") {
+  push({
+    path: "/login",
+  });
+}
 </script>
 
 <template>
