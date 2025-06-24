@@ -22,7 +22,7 @@ if (!token.value || token.value === "") {
           class="flex items-center hover:opacity-90 transition-opacity duration-200"
         >
           <i class="fas fa-address-book text-white text-2xl mr-3"></i>
-          <div class="text-white font-bold text-xl">Contact Management</div>
+          <div class="hidden md:block text-white font-bold text-xl">Contact Management</div>
         </RouterLink>
         <nav>
           <ul class="flex space-x-6">

@@ -17,4 +17,3 @@ if (token !== "") {
   });
 }
 </script>
-<style lang=""></style>
