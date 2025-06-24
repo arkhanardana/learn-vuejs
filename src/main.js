@@ -7,48 +7,55 @@ import UserLogin from "./components/User/UserLogin.vue";
 import DashboardLayout from "./components/DashboardLayout.vue";
 import ContactList from "./components/Contact/ContactList.vue";
 import ContactCreate from "./components/Contact/ContactCreate.vue";
+import ContactDetail from "./components/Contact/ContactDetail.vue";
 import UserProfile from "./components/User/UserProfile.vue";
 import UserLogout from "./components/User/UserLogout.vue";
 
+const routes = [
+  {
+    component: Layout,
+    children: [
+      {
+        path: "/register",
+        component: UserRegister,
+      },
+      {
+        path: "/login",
+        component: UserLogin,
+      },
+    ],
+  },
+  {
+    component: DashboardLayout,
+    path: "/dashboard",
+    children: [
+      {
+        path: "contacts",
+        component: ContactList,
+      },
+      {
+        path: "contacts/create",
+        component: ContactCreate,
+      },
+      {
+        path: "contacts/:id",
+        component: ContactDetail,
+      },
+      {
+        path: "users/profile",
+        component: UserProfile,
+      },
+      {
+        path: "users/logout",
+        component: UserLogout,
+      },
+    ],
+  },
+];
+
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      component: Layout,
-      children: [
-        {
-          path: "/register",
-          component: UserRegister,
-        },
-        {
-          path: "/login",
-          component: UserLogin,
-        },
-      ],
-    },
-    {
-      component: DashboardLayout,
-      path: "/dashboard",
-      children: [
-        {
-          path: "contacts",
-          component: ContactList,
-        },
-        {
-          path: "contacts/create",
-          component: ContactCreate,
-        },
-        {
-          path: "users/profile",
-          component: UserProfile,
-        },
-        {
-          path: "users/logout",
-          component: UserLogout,
-        },
-      ],
-    },
-  ],
+  routes,
 });
 
 createApp(App).use(router).mount("#app");
