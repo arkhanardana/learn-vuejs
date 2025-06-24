@@ -17,7 +17,6 @@ const token = useLocalStorage("token", "");
 const handleLogin = async () => {
   const response = await userLogin(user);
   const resBody = await response.json();
-  console.log(resBody);
 
   if (response.status === 200) {
     token.value = resBody.data.token;
@@ -102,4 +101,3 @@ const handleLogin = async () => {
     </form>
   </div>
 </template>
-<style lang=""></style>

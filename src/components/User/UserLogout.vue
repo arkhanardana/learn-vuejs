@@ -11,7 +11,6 @@ const router = useRouter();
 async function handleLogout() {
   const response = await userLogout(token.value);
   const responseBody = await response.json();
-  console.log(responseBody);
 
   if (response.status === 200) {
     token.value = "";
@@ -29,5 +28,3 @@ onBeforeMount(async () => {
 </script>
 
 <template></template>
-
-<style scoped></style>
