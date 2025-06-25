@@ -10,6 +10,10 @@ if (!token.value || token.value === "") {
   push({
     path: "/login",
   });
+} else {
+  push({
+    path: "/dashboard/contacts",
+  });
 }
 </script>
 
