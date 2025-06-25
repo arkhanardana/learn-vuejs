@@ -296,7 +296,7 @@ onMounted(() => {
     </div>
 
     <!-- Pagination -->
-    <div class="mt-10 flex justify-center">
+    <div class="mt-10 flex justify-center" v-if="contacts.length >= 1">
       <nav
         class="flex items-center space-x-3 bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-3 animate-fade-in"
       >
