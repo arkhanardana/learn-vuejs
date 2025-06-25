@@ -1,24 +1,76 @@
 <script setup>
-import { onMounted } from "vue";
+import { onBeforeMount, onMounted, reactive, watch } from "vue";
 import { getContacts } from "../../lib/api/ContactApi";
 import { ref } from "vue";
 import { useLocalStorage } from "@vueuse/core";
+import { alertError } from "../../lib/alert";
 
 const contacts = ref([]);
 const token = useLocalStorage("token", "");
+const search = reactive({
+  name: "",
+  email: "",
+  phone: "",
+});
+const page = ref(1);
+const totalPage = ref(1);
+const pages = ref([]);
 
-const getAllContacts = async () => {
+watch(
+  totalPage,
+  (value) => {
+    const data = [];
+    for (let i = 1; i <= value; i++) {
+      data.push(i);
+    }
+    pages.value = data;
+  },
+  {
+    immediate: true,
+  }
+);
+
+const fetchContacts = async () => {
   try {
-    const res = await getContacts(token.value);
+    const res = await getContacts(token.value, {
+      name: search.name,
+      email: search.email,
+      phone: search.phone,
+      page: page.value,
+    });
     const resBody = await res.json();
     contacts.value = resBody.data;
+    totalPage.value = resBody.paging.total_page;
   } catch (error) {
     console.log(error);
+    await alertError(resBody.errors);
   }
 };
 
-onMounted(async () => {
-  await getAllContacts();
+onBeforeMount(async () => {
+  await fetchContacts();
+});
+
+const handleSearch = async () => {
+  page.value = 1;
+  await fetchContacts();
+};
+
+const handleResetSearch = async () => {
+  search.name = "";
+  search.email = "";
+  search.phone = "";
+
+  await fetchContacts();
+};
+
+const handleChangePage = async (value) => {
+  page.value = value;
+
+  await fetchContacts();
+};
+
+onMounted(() => {
   document.addEventListener("DOMContentLoaded", function () {
     const toggleButton = document.getElementById("toggleSearchForm");
     const searchFormContent = document.getElementById("searchFormContent");
@@ -75,7 +127,7 @@ onMounted(async () => {
         </button>
       </div>
       <div id="searchFormContent" class="mt-4">
-        <form>
+        <form @submit.prevent="handleSearch">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label for="search_name" class="block text-gray-300 text-sm font-medium mb-2"
@@ -93,6 +145,7 @@ onMounted(async () => {
                   name="search_name"
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Search by name"
+                  v-model="search.name"
                 />
               </div>
             </div>
@@ -112,6 +165,7 @@ onMounted(async () => {
                   name="search_email"
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Search by email"
+                  v-model="search.email"
                 />
               </div>
             </div>
@@ -131,11 +185,19 @@ onMounted(async () => {
                   name="search_phone"
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Search by phone"
+                  v-model="search.phone"
                 />
               </div>
             </div>
           </div>
-          <div class="mt-5 text-right">
+          <div class="mt-5 flex justify-end items-center gap-4">
+            <button
+              @click="handleResetSearch"
+              type="button"
+              class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5"
+            >
+              Reset
+            </button>
             <button
               type="submit"
               class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5"
@@ -147,9 +209,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Contact cards grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Create New Contact Card -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
       <div
         class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom overflow-hidden border-2 border-dashed border-gray-700 card-hover animate-fade-in"
       >
@@ -166,12 +226,19 @@ onMounted(async () => {
         </RouterLink>
       </div>
 
+      <h1
+        v-if="contacts.length === 0"
+        class="text-white opacity-90 text-center flex items-center justify-center"
+      >
+        No result found.
+      </h1>
+
       <div
         v-for="contact in contacts"
         :key="contact.id"
         class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in"
       >
-        <div class="p-6">
+        <div class="p-5">
           <RouterLink
             :to="`/dashboard/contacts/${contact.id}`"
             class="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3"
@@ -213,7 +280,7 @@ onMounted(async () => {
           </RouterLink>
           <div class="mt-4 flex justify-end space-x-3">
             <RouterLink
-              :to="`/dashboard/contacts/edit/${contact.id}`"
+              :to="`/dashboard/contacts/${contact.id}/edit`"
               class="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
             >
               <i class="fas fa-edit mr-2"></i> Edit
@@ -235,30 +302,29 @@ onMounted(async () => {
       >
         <a
           href="#"
+          v-if="page > 1"
+          v-on:click="() => handleChangePage(page - 1)"
           class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
         >
           <i class="fas fa-chevron-left mr-2"></i> Previous
         </a>
         <a
           href="#"
-          class="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md"
+          v-for="value in pages"
+          :key="value"
+          v-on:click="() => handleChangePage(value)"
+          :class="[
+            page === value
+              ? 'px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md'
+              : 'px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200',
+          ]"
         >
-          1
+          {{ value }}
         </a>
         <a
           href="#"
-          class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
-        >
-          2
-        </a>
-        <a
-          href="#"
-          class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200"
-        >
-          3
-        </a>
-        <a
-          href="#"
+          v-if="page < totalPage"
+          v-on:click="() => handleChangePage(page + 1)"
           class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
         >
           Next <i class="fas fa-chevron-right ml-2"></i>
