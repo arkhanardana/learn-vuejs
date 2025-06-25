@@ -1,7 +1,13 @@
 import { API_URL } from "./UserApi";
 
-export const getContacts = async (token) => {
-  return await fetch(`${API_URL}/contacts`, {
+export const getContacts = async (token, { name, email, phone, page }) => {
+  const url = new URL(`${API_URL}/contacts`);
+  if (name) url.searchParams.append("name", name);
+  if (email) url.searchParams.append("email", email);
+  if (phone) url.searchParams.append("phone", phone);
+  if (page) url.searchParams.append("page", page);
+
+  return await fetch(url, {
     method: "GET",
     headers: {
       "Content-type": "application/json",
