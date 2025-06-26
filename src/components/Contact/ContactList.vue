@@ -1,9 +1,9 @@
 <script setup>
 import { onBeforeMount, onMounted, reactive, watch } from "vue";
-import { getContacts } from "../../lib/api/ContactApi";
+import { deleteContact, getContacts } from "../../lib/api/ContactApi";
 import { ref } from "vue";
 import { useLocalStorage } from "@vueuse/core";
-import { alertError } from "../../lib/alert";
+import { alerConfirm, alertError, alertSuccess } from "../../lib/alert";
 
 const contacts = ref([]);
 const token = useLocalStorage("token", "");
@@ -25,9 +25,7 @@ watch(
     }
     pages.value = data;
   },
-  {
-    immediate: true,
-  }
+  { immediate: true }
 );
 
 const fetchContacts = async () => {
@@ -62,6 +60,21 @@ const handleResetSearch = async () => {
   search.phone = "";
 
   await fetchContacts();
+};
+
+const handleDelete = async (id) => {
+  if (!(await alerConfirm("Are you sure to delete this contact?"))) {
+    return;
+  }
+
+  try {
+    await deleteContact(token.value, id);
+    await alertSuccess("Contact deleted successfully");
+  } catch (error) {
+    await alertError("Contact not found");
+  } finally {
+    await fetchContacts();
+  }
 };
 
 const handleChangePage = async (value) => {
@@ -286,6 +299,7 @@ onMounted(() => {
               <i class="fas fa-edit mr-2"></i> Edit
             </RouterLink>
             <button
+              @click="handleDelete(contact.id)"
               class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
             >
               <i class="fas fa-trash-alt mr-2"></i> Delete
