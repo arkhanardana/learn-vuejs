@@ -2,16 +2,15 @@
 import { RouterLink, useRouter } from "vue-router";
 import { useLocalStorage } from "@vueuse/core";
 
-const { push } = useRouter();
-
+const router = useRouter();
 const token = useLocalStorage("token", "");
 
 if (!token.value || token.value === "") {
-  push({
+  router.push({
     path: "/login",
   });
 } else {
-  push({
+  router.push({
     path: "/dashboard/contacts",
   });
 }
@@ -19,7 +18,7 @@ if (!token.value || token.value === "") {
 
 <template>
   <div class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen flex flex-col">
-    <header class="bg-gradient shadow-lg">
+    <header class="bg-gradient shadow-lg sticky top-0 z-50">
       <div class="container mx-auto px-4 py-4 flex justify-between items-center">
         <RouterLink
           to="/dashboard/contacts"
