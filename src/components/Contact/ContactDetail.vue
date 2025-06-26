@@ -6,7 +6,7 @@
 import { useRoute } from "vue-router";
 import { getContact } from "../../lib/api/ContactApi";
 import { useLocalStorage } from "@vueuse/core";
-import { onMounted } from "vue";
+import { onBeforeMount } from "vue";
 
 const route = useRoute();
 const token = useLocalStorage("token", "");
@@ -22,7 +22,7 @@ const fetchContactDetail = async () => {
   }
 };
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await fetchContactDetail();
 });
 </script>
