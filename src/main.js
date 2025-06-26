@@ -10,6 +10,7 @@ import ContactCreate from "./components/Contact/ContactCreate.vue";
 import ContactDetail from "./components/Contact/ContactDetail.vue";
 import UserProfile from "./components/User/UserProfile.vue";
 import UserLogout from "./components/User/UserLogout.vue";
+import ContactEdit from "./components/Contact/ContactEdit.vue";
 
 const routes = [
   {
@@ -40,6 +41,10 @@ const routes = [
       {
         path: "contacts/:id",
         component: ContactDetail,
+      },
+      {
+        path: "contacts/:id/edit",
+        component: ContactEdit,
       },
       {
         path: "users/profile",
