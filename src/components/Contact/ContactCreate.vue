@@ -7,6 +7,7 @@ import { createContact } from "../../lib/api/ContactApi";
 
 const token = useLocalStorage("token", "");
 const router = useRouter();
+
 const contact = reactive({
   first_name: "",
   last_name: "",
@@ -14,18 +15,22 @@ const contact = reactive({
   phone: "",
 });
 
-const handleCreateContact = async () => {
+const handleCreate = async () => {
   try {
     const res = await createContact(token.value, contact);
-    await res.json();
+    const resBody = await res.json();
 
-    await alertSuccess("Contact created successfully");
-    await router.push({
-      path: "/dashboard/contacts",
-    });
+    if (!res.ok) {
+      await alertError(resBody.errors);
+    } else {
+      await alertSuccess("Contact created successfully");
+      await router.push({
+        path: "/dashboard/contacts",
+      });
+    }
   } catch (error) {
     console.log(error);
-    await alertError(resBody.errors);
+    await alertError(error);
   }
 };
 </script>
@@ -37,7 +42,7 @@ const handleCreateContact = async () => {
     >
       <i class="fas fa-arrow-left mr-2"></i> Back to Contacts
     </RouterLink>
-    <div class="flex items-center mb-6 mt-6">
+    <div class="flex items-center mb-6 lg:mt-6 mt-3">
       <h1 class="text-2xl font-bold text-white flex items-center">
         <i class="fas fa-user-plus text-blue-400 mr-3"></i> Create New Contact
       </h1>
@@ -47,7 +52,7 @@ const handleCreateContact = async () => {
       class="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden max-w-2xl mx-auto animate-fade-in"
     >
       <div class="p-8">
-        <form @submit.prevent="handleCreateContact">
+        <form @submit.prevent="handleCreate">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <div>
               <label for="first_name" class="block text-gray-300 text-sm font-medium mb-2"
