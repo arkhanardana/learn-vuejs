@@ -6,7 +6,6 @@ import { contactEdit, getContact } from "../../lib/api/ContactApi";
 import { alertError, alertSuccess } from "../../lib/alert";
 
 const route = useRoute();
-const router = useRouter();
 const { id } = route.params;
 const token = useLocalStorage("token", "");
 
@@ -41,9 +40,6 @@ const handleEdit = async (id) => {
     }
 
     await alertSuccess("Contact edited succesfully");
-    await router.push({
-      path: "/dashboard/contacts",
-    });
   } catch (error) {
     await alertError(error);
   }
