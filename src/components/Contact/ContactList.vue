@@ -12,7 +12,7 @@ const search = reactive({
   email: "",
   phone: "",
 });
-const page = ref(1);
+const currentPage = ref(1);
 const totalPage = ref(1);
 const pages = ref([]);
 
@@ -34,7 +34,7 @@ const fetchContacts = async () => {
       name: search.name,
       email: search.email,
       phone: search.phone,
-      page: page.value,
+      page: currentPage.value,
     });
     const resBody = await res.json();
     contacts.value = resBody.data;
@@ -50,7 +50,7 @@ onBeforeMount(async () => {
 });
 
 const handleSearch = async () => {
-  page.value = 1;
+  currentPage.value = 1;
   await fetchContacts();
 };
 
@@ -78,7 +78,7 @@ const handleDelete = async (id) => {
 };
 
 const handleChangePage = async (value) => {
-  page.value = value;
+  currentPage.value = value;
 
   await fetchContacts();
 };
@@ -281,7 +281,7 @@ onMounted(() => {
               </p>
               <p class="flex items-center">
                 <i class="fas fa-envelope text-gray-500 w-6"></i>
-                <span class="font-medium w-24">Email:</span>
+                <span class="font-medium w-24 px-2 lg:px-0">Email:</span>
                 <span>{{ contact.email }}</span>
               </p>
               <p class="flex items-center">
@@ -316,8 +316,8 @@ onMounted(() => {
       >
         <a
           href="#"
-          v-if="page > 1"
-          v-on:click="() => handleChangePage(page - 1)"
+          v-if="currentPage > 1"
+          v-on:click="() => handleChangePage(currentPage - 1)"
           class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
         >
           <i class="fas fa-chevron-left mr-2"></i> Previous
@@ -328,7 +328,7 @@ onMounted(() => {
           :key="value"
           v-on:click="() => handleChangePage(value)"
           :class="[
-            page === value
+            currentPage === value
               ? 'px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md'
               : 'px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200',
           ]"
@@ -337,8 +337,8 @@ onMounted(() => {
         </a>
         <a
           href="#"
-          v-if="page < totalPage"
-          v-on:click="() => handleChangePage(page + 1)"
+          v-if="currentPage < totalPage"
+          v-on:click="() => handleChangePage(currentPage + 1)"
           class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center"
         >
           Next <i class="fas fa-chevron-right ml-2"></i>
