@@ -8,13 +8,14 @@ import { alertError, alertSuccess } from "../../lib/alert";
 const route = useRoute();
 const router = useRouter();
 const { id } = route.params;
+const token = useLocalStorage("token", "");
+
 const contact = reactive({
   first_name: "",
-  last_name: "",
+  last_name: "f",
   email: "",
   phone: "",
 });
-const token = useLocalStorage("token", "");
 
 const fetchContact = async () => {
   try {
