@@ -1,14 +1,41 @@
 <script setup>
-import { RouterLink, useRoute } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { getContact } from "../../lib/api/ContactApi";
 import { useLocalStorage } from "@vueuse/core";
-import { alertError } from "../../lib/alert";
-import { onBeforeMount, onMounted, ref } from "vue";
+import { alertError, alertSuccess } from "../../lib/alert";
+import { onMounted, reactive, ref } from "vue";
+import { addressCreate } from "../../lib/api/AddressApi";
 
+const router = useRouter();
 const route = useRoute();
 const { id } = route.params;
 const token = useLocalStorage("token", "");
 const contact = ref([]);
+const address = reactive({
+  street: "",
+  province: "",
+  city: "",
+  country: "",
+  postal_code: "",
+});
+
+const handleCreateAddress = async () => {
+  try {
+    const res = await addressCreate(token.value, id, address);
+    await res.json();
+
+    if (!res.ok) {
+      await alertError("Something went wrong");
+    }
+
+    await alertSuccess("Address created successfully");
+    await router.push({
+      path: `/dashboard/contacts/${id}`,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const fetchContactDetail = async () => {
   try {
@@ -64,7 +91,7 @@ onMounted(async () => {
           </div>
         </div>
 
-        <form>
+        <form @submit.prevent="handleCreateAddress">
           <div class="mb-5">
             <label for="street" class="block text-gray-300 text-sm font-medium mb-2"
               >Street</label
@@ -82,6 +109,7 @@ onMounted(async () => {
                 class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 placeholder="Enter street address"
                 required
+                v-model="address.street"
               />
             </div>
           </div>
@@ -103,6 +131,7 @@ onMounted(async () => {
                   name="city"
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter city"
+                  v-model="address.city"
                   required
                 />
               </div>
@@ -123,6 +152,7 @@ onMounted(async () => {
                   name="province"
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter province or state"
+                  v-model="address.province"
                   required
                 />
               </div>
@@ -146,6 +176,7 @@ onMounted(async () => {
                   name="country"
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter country"
+                  v-model="address.country"
                   required
                 />
               </div>
@@ -167,6 +198,7 @@ onMounted(async () => {
                   class="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   placeholder="Enter postal code"
                   required
+                  v-model="address.postal_code"
                 />
               </div>
             </div>
