@@ -53,10 +53,10 @@ onMounted(async () => {
   <div class="container mx-auto px-4 py-8 flex-grow max-w-3xl">
     <div class="flex items-start justify-center flex-col md:mx-10 gap-y-4">
       <RouterLink
-        to="/dashboard/contacts"
+        :to="`/dashboard/contacts/${id}`"
         class="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
       >
-        <i class="fas fa-arrow-left mr-2"></i> Back to Contacts
+        <i class="fas fa-arrow-left mr-2"></i> Back to Contact Details
       </RouterLink>
       <div class="flex items-center mb-6">
         <h1 class="text-2xl font-bold text-white flex items-center">
@@ -162,7 +162,7 @@ onMounted(async () => {
 
           <div class="flex justify-end space-x-4">
             <RouterLink
-              to="/dashboard/contacts"
+              :to="`/dashboard/contacts/${id}`"
               class="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md"
             >
               <i class="fas fa-times mr-2"></i> Cancel
