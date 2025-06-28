@@ -1,7 +1,7 @@
 <script setup>
 import { useLocalStorage } from "@vueuse/core";
 import { onMounted, reactive } from "vue";
-import { RouterLink, useRoute, useRouter } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import { contactEdit, getContact } from "../../lib/api/ContactApi";
 import { alertError, alertSuccess } from "../../lib/alert";
 
@@ -11,7 +11,7 @@ const token = useLocalStorage("token", "");
 
 const contact = reactive({
   first_name: "",
-  last_name: "f",
+  last_name: "",
   email: "",
   phone: "",
 });
