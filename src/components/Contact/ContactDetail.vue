@@ -3,12 +3,48 @@ import { useRoute, RouterLink } from "vue-router";
 import { getContact } from "../../lib/api/ContactApi";
 import { useLocalStorage } from "@vueuse/core";
 import { onBeforeMount, ref } from "vue";
-import { alertError } from "../../lib/alert";
+import { alerConfirm, alertError, alertSuccess } from "../../lib/alert";
+import { deleteAddress, getAddresses } from "../../lib/api/AddressApi";
 
 const route = useRoute();
 const token = useLocalStorage("token", "");
 const { id } = route.params;
 const contact = ref([]);
+const addresses = ref([]);
+
+const fetchAddresses = async () => {
+  try {
+    const res = await getAddresses(token.value, id);
+    const resBody = await res.json();
+    console.log(resBody);
+
+    addresses.value = resBody.data;
+    console.log(addresses.value);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const handleDeleteAddress = async (addressId) => {
+  if (!(await alerConfirm("Are you sure to delete this address"))) {
+    return;
+  }
+
+  try {
+    const res = await deleteAddress(token.value, id, addressId);
+    const resBody = await res.json();
+
+    if (!res.ok) {
+      await alertError(resBody.errors);
+    }
+
+    await alertSuccess("Address deleted successfully");
+    await fetchAddresses();
+  } catch (error) {
+    console.log(error);
+    await alertError(error);
+  }
+};
 
 const fetchContactDetail = async () => {
   try {
@@ -25,6 +61,7 @@ const fetchContactDetail = async () => {
 
 onBeforeMount(async () => {
   await fetchContactDetail();
+  await fetchAddresses();
 });
 </script>
 
@@ -56,7 +93,6 @@ onBeforeMount(async () => {
           <h2 class="text-2xl font-bold text-white mb-2">
             {{ item.first_name }} {{ item.last_name }}
           </h2>
-          <div class="w-24 h-1 bg-gradient mx-auto rounded-full"></div>
         </div>
 
         <!-- Contact Information -->
@@ -129,8 +165,10 @@ onBeforeMount(async () => {
               </RouterLink>
             </div>
 
-            <!-- Address Card 1 -->
+            <!-- Address Card -->
             <div
+              v-for="address in addresses"
+              :key="address.id"
               class="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 card-hover"
             >
               <div class="flex items-center mb-3">
@@ -139,97 +177,45 @@ onBeforeMount(async () => {
                 >
                   <i class="fas fa-home text-white"></i>
                 </div>
-                <h4 class="text-lg font-semibold text-white">Home Address</h4>
+                <h4 class="text-lg font-semibold text-white">Address</h4>
               </div>
               <div class="space-y-3 text-gray-300 ml-2 mb-4">
                 <p class="flex items-center">
                   <i class="fas fa-road text-gray-500 w-6"></i>
                   <span class="font-medium w-24">Street:</span>
-                  <span>123 Main St</span>
+                  <span>{{ address.street }}</span>
                 </p>
                 <p class="flex items-center">
                   <i class="fas fa-city text-gray-500 w-6"></i>
                   <span class="font-medium w-24">City:</span>
-                  <span>New York</span>
+                  <span>{{ address.city }}</span>
                 </p>
                 <p class="flex items-center">
                   <i class="fas fa-map text-gray-500 w-6"></i>
                   <span class="font-medium w-24">Province:</span>
-                  <span>NY</span>
+                  <span>{{ address.city }}</span>
                 </p>
                 <p class="flex items-center">
                   <i class="fas fa-flag text-gray-500 w-6"></i>
                   <span class="font-medium w-24">Country:</span>
-                  <span>USA</span>
+                  <span>{{ address.country }}</span>
                 </p>
                 <p class="flex items-center">
-                  <i class="fas fa-mailbox text-gray-500 w-6"></i>
+                  <i class="fas fa-mail-bulk text-gray-500 w-6"></i>
                   <span class="font-medium w-24">Postal Code:</span>
-                  <span>10001</span>
+                  <span>{{ address.postal_code }}</span>
                 </p>
               </div>
               <div class="flex justify-end space-x-3">
-                <a
+                <RouterLink
+                  :to="`/dashboard/contacts/${id}/addresses/${address.id}/edit`"
                   href="edit_address.html"
                   class="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
                 >
                   <i class="fas fa-edit mr-2"></i> Edit
-                </a>
+                </RouterLink>
                 <button
-                  class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
-                >
-                  <i class="fas fa-trash-alt mr-2"></i> Delete
-                </button>
-              </div>
-            </div>
-
-            <!-- Address Card 2 -->
-            <div
-              class="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 card-hover"
-            >
-              <div class="flex items-center mb-3">
-                <div
-                  class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3 shadow-md"
-                >
-                  <i class="fas fa-building text-white"></i>
-                </div>
-                <h4 class="text-lg font-semibold text-white">Work Address</h4>
-              </div>
-              <div class="space-y-3 text-gray-300 ml-2 mb-4">
-                <p class="flex items-center">
-                  <i class="fas fa-road text-gray-500 w-6"></i>
-                  <span class="font-medium w-24">Street:</span>
-                  <span>456 Oak Ave</span>
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-city text-gray-500 w-6"></i>
-                  <span class="font-medium w-24">City:</span>
-                  <span>San Francisco</span>
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-map text-gray-500 w-6"></i>
-                  <span class="font-medium w-24">Province:</span>
-                  <span>CA</span>
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-flag text-gray-500 w-6"></i>
-                  <span class="font-medium w-24">Country:</span>
-                  <span>USA</span>
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-mailbox text-gray-500 w-6"></i>
-                  <span class="font-medium w-24">Postal Code:</span>
-                  <span>94102</span>
-                </p>
-              </div>
-              <div class="flex justify-end space-x-3">
-                <a
-                  href="edit_address.html"
-                  class="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
-                >
-                  <i class="fas fa-edit mr-2"></i> Edit
-                </a>
-                <button
+                  @click="handleDeleteAddress(address.id)"
                   class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center"
                 >
                   <i class="fas fa-trash-alt mr-2"></i> Delete
@@ -247,12 +233,12 @@ onBeforeMount(async () => {
           >
             <i class="fas fa-arrow-left mr-2"></i> Back
           </RouterLink>
-          <a
-            href="edit_contact.html"
+          <RouterLink
+            :to="`/dashboard/contacts/${id}/edit`"
             class="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center"
           >
             <i class="fas fa-user-edit mr-2"></i> Edit Contact
-          </a>
+          </RouterLink>
         </div>
       </div>
     </div>
