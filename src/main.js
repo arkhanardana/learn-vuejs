@@ -11,6 +11,7 @@ import ContactDetail from "./components/Contact/ContactDetail.vue";
 import UserProfile from "./components/User/UserProfile.vue";
 import UserLogout from "./components/User/UserLogout.vue";
 import ContactEdit from "./components/Contact/ContactEdit.vue";
+import AddressCreate from "./components/Address/AddressCreate.vue";
 
 const routes = [
   {
@@ -41,6 +42,10 @@ const routes = [
       {
         path: "contacts/:id",
         component: ContactDetail,
+      },
+      {
+        path: "contacts/:id/addresses/create",
+        component: AddressCreate,
       },
       {
         path: "contacts/:id/edit",
