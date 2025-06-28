@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import { createRouter, createWebHistory } from "vue-router";
-import Layout from "./components/Layout.vue";
+import AuthLayout from "./components/AuthLayout.vue";
 import UserRegister from "./components/User/UserRegister.vue";
 import UserLogin from "./components/User/UserLogin.vue";
 import DashboardLayout from "./components/DashboardLayout.vue";
@@ -12,10 +12,16 @@ import UserProfile from "./components/User/UserProfile.vue";
 import UserLogout from "./components/User/UserLogout.vue";
 import ContactEdit from "./components/Contact/ContactEdit.vue";
 import AddressCreate from "./components/Address/AddressCreate.vue";
+import AddressEdit from "./components/Address/AddressEdit.vue";
+import RootLayout from "./components/RootLayout.vue";
 
 const routes = [
   {
-    component: Layout,
+    component: RootLayout,
+    path: "/",
+  },
+  {
+    component: AuthLayout,
     children: [
       {
         path: "/register",
@@ -46,6 +52,10 @@ const routes = [
       {
         path: "contacts/:id/addresses/create",
         component: AddressCreate,
+      },
+      {
+        path: "contacts/:id/addresses/:addressId/edit",
+        component: AddressEdit,
       },
       {
         path: "contacts/:id/edit",
