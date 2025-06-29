@@ -16,7 +16,6 @@ const fetchAddresses = async () => {
   try {
     const res = await getAddresses(token.value, id);
     const resBody = await res.json();
-    console.log(resBody);
 
     addresses.value = resBody.data;
     console.log(addresses.value);
