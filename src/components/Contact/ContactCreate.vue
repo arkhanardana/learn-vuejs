@@ -22,12 +22,11 @@ const handleCreate = async () => {
 
     if (!res.ok) {
       await alertError(resBody.errors);
-    } else {
-      await alertSuccess("Contact created successfully");
-      await router.push({
-        path: "/dashboard/contacts",
-      });
     }
+    await alertSuccess("Contact created successfully");
+    await router.push({
+      path: "/dashboard/contacts",
+    });
   } catch (error) {
     console.log(error);
     await alertError(error);
