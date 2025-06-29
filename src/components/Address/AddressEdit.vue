@@ -55,7 +55,7 @@ const fetchAddress = async () => {
 const handleEditAddress = async () => {
   try {
     const res = await updateAddress(token.value, id, addressId, address);
-    await res.json();
+    const resBody = await res.json();
 
     if (!res.ok) {
       await alertError(resBody.errors);
