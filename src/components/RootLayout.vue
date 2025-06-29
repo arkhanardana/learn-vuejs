@@ -7,7 +7,7 @@ const router = useRouter();
 
 if (!token.value || token.value === "") {
   router.push({
-    path: "/register",
+    path: "/login",
   });
 } else {
   router.push({
