@@ -43,7 +43,7 @@ const fetchContactDetail = async () => {
     const resBody = await res.json();
 
     if (!res.ok) {
-      await alertError("Something went wrong");
+      await alertError(resBody.errors);
     }
 
     contact.value = resBody;
