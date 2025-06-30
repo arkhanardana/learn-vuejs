@@ -1,6 +1,6 @@
 import { API_URL } from "./UserApi";
 
-export const addressCreate = async (
+export const createAddress = async (
   token,
   contactId,
   { street, city, province, country, postal_code }

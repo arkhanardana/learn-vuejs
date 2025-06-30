@@ -4,7 +4,7 @@ import { getContact } from "../../lib/api/ContactApi";
 import { useLocalStorage } from "@vueuse/core";
 import { alertError, alertSuccess } from "../../lib/alert";
 import { onMounted, reactive, ref } from "vue";
-import { addressCreate } from "../../lib/api/AddressApi";
+import { createAddress } from "../../lib/api/AddressApi";
 
 const router = useRouter();
 const route = useRoute();
@@ -21,7 +21,7 @@ const address = reactive({
 
 const handleCreateAddress = async () => {
   try {
-    const res = await addressCreate(token.value, id, address);
+    const res = await createAddress(token.value, id, address);
     await res.json();
 
     if (!res.ok) {
